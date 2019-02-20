@@ -13,6 +13,7 @@ public class Shell {
 
     private void run() throws IOException {
         Scanner scanner = new Scanner(System.in);
+        Environment environment = new Environment();
         Parser parser = new Parser();
         while (true) {
             System.out.print("$ ");
@@ -20,12 +21,14 @@ public class Shell {
             if (line.trim().equals("exit")) {
                 break;
             }
-            List<Command> commands = parser.parse(line);
+            List<Command> commands = parser.parse(line, environment);
             String prevResult = "";
             for (Command command : commands) {
                 prevResult = command.execute(prevResult);
             }
-            System.out.println(prevResult);
+            if (!prevResult.isEmpty()) {
+                System.out.println(prevResult);
+            }
         }
     }
 }

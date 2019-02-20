@@ -3,17 +3,18 @@ package ru.ifmo.sdc.cli.commands;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 
 public class WcCommand extends Command {
-    public WcCommand(String args) {
+    public WcCommand(List<String> args) {
         super(args);
     }
 
     @Override
     public String execute(String prevResult) throws IOException {
         String text;
-        if (!args.equals("")) {
-            text = new String(Files.readAllBytes(Paths.get(args)));
+        if (args.size() > 1) {
+            text = new String(Files.readAllBytes(Paths.get(args.get(1))));
         } else {
             text = prevResult;
         }

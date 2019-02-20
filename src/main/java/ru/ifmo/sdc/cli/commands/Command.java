@@ -1,12 +1,13 @@
 package ru.ifmo.sdc.cli.commands;
 
 import java.io.IOException;
+import java.util.List;
 
 public abstract class Command {
-    protected final String args;
+    protected final List<String> args;
 
-    public Command(String args) {
-        this.args = args.trim();
+    public Command(List<String> args) {
+        this.args = args;
     }
 
     public abstract String execute(String prevResult) throws IOException;
