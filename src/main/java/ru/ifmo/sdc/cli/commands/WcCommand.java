@@ -13,13 +13,13 @@ public class WcCommand extends Command {
     @Override
     public String execute(String prevResult) throws IOException {
         String text;
-        if (args.size() > 1) {
-            text = new String(Files.readAllBytes(Paths.get(args.get(1))));
+        if (args.size() > 2) {
+            text = new String(Files.readAllBytes(Paths.get(args.get(2))));
         } else {
             text = prevResult;
         }
         int lines = text.split("\n").length;
-        int words = text.split(" ").length;
+        int words = text.split(" ").length + 1;
         int bytes = text.getBytes().length;
         return String.format("%d %d %d", lines, words, bytes);
     }

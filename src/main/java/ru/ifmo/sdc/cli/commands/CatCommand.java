@@ -13,8 +13,8 @@ public class CatCommand extends Command {
     @Override
     public String execute(String prevResult) throws IOException {
         String text;
-        if (args.size() > 1) {
-            text = new String(Files.readAllBytes(Paths.get(args.get(1))));
+        if (args.size() > 2) {
+            text = new String(Files.readAllBytes(Paths.get(args.get(2)))).trim();
         } else {
             text = prevResult;
         }

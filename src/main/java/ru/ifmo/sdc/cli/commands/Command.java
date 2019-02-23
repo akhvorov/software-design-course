@@ -11,4 +11,10 @@ public abstract class Command {
     }
 
     public abstract String execute(String prevResult) throws IOException;
+
+    protected String tokensToString(List<String> tokens) {
+        StringBuilder sb = new StringBuilder();
+        tokens.stream().filter(t -> !t.equals("'") && !t.equals("\"")).forEach(sb::append);
+        return sb.toString().trim();
+    }
 }

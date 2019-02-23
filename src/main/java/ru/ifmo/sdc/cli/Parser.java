@@ -7,24 +7,46 @@ import java.util.stream.Collectors;
 
 class Parser {
     private static final Set<Character> SPLITERS_SET = new HashSet<>(Arrays.asList('\'', '"', '|', '=', '$'));
+    private static final Set<String> KNOWN_COMMANDS_SET = new HashSet<>(Arrays.asList("echo", "cat", "wc", "pwd", "exit"));
     private static final CommandFactory commandFactory = new CommandFactory();
 
     List<Command> parse(String line, Environment environment) {
         List<String> tokens = substitude(tokenize(line), environment);
-        System.out.println(tokens);
         return groupByCommand(tokens).stream().map(commandFactory::getCommand).collect(Collectors.toList());
     }
 
     private List<String> tokenize(String line) {
         List<String> tokens = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
+        char quotesType;
         for (int i = 0; i < line.length(); i++) {
             char symbol = line.charAt(i);
             if (symbol == ' ') {
+                String currentToken = sb.toString().trim();
+                if (!currentToken.isEmpty()) {
+                    tokens.add(currentToken);
+                    sb = new StringBuilder();
+                }
+                tokens.add(" ");
+                while (i < line.length() && line.charAt(i) == ' ') {
+                    i++;
+                }
+                i--;
+            } else if (symbol == '\'' || symbol == '"') {
                 if (!sb.toString().isEmpty()) {
                     tokens.add(sb.toString());
                     sb = new StringBuilder();
                 }
+                quotesType = symbol;
+                tokens.add(String.valueOf(quotesType));
+                i++;
+                while (i < line.length() && line.charAt(i) != quotesType) {
+                    sb.append(line.charAt(i));
+                    i++;
+                }
+                tokens.add(sb.toString());
+                sb = new StringBuilder();
+                tokens.add(String.valueOf(quotesType));
             } else if (SPLITERS_SET.contains(symbol)) {
                 if (!sb.toString().isEmpty()) {
                     tokens.add(sb.toString());
@@ -74,10 +96,13 @@ class Parser {
     private List<List<String>> groupByCommand(List<String> tokens) {
         List<List<String>> commandGroups = new ArrayList<>();
         List<String> currentCommand = new ArrayList<>();
-        for (String token : tokens) {
+        for (int i = 0; i < tokens.size(); i++) {
+            String token = tokens.get(i);
             if (token.equals("|")) {
+                currentCommand.remove(currentCommand.size() - 1);
                 commandGroups.add(currentCommand);
                 currentCommand = new ArrayList<>();
+                i++;
                 continue;
             }
             currentCommand.add(token);

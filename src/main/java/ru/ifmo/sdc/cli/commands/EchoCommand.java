@@ -9,7 +9,6 @@ public class EchoCommand extends Command {
 
     @Override
     public String execute(String prevResult) {
-        // TODO: rewrite quotes handle
-        return args.stream().limit(args.size() - 1).skip(2).reduce("", (x, y) -> x + y);
+        return tokensToString(args.subList(1, args.size()));
     }
 }
