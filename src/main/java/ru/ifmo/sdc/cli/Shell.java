@@ -15,15 +15,17 @@ public class Shell {
         Scanner scanner = new Scanner(System.in);
         Environment environment = new Environment();
         Parser parser = new Parser();
-        while (true) {
+        boolean isAlive = true;
+        while (isAlive) {
             System.out.print("$ ");
             String line = scanner.nextLine();
-            if (line.trim().equals("exit")) {
-                break;
-            }
             List<Command> commands = parser.parse(line, environment);
             String prevResult = "";
             for (Command command : commands) {
+                if (command.isTerminate()) {
+                    isAlive = false;
+                    break;
+                }
                 prevResult = command.execute(prevResult);
             }
             if (!prevResult.isEmpty()) {

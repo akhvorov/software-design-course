@@ -10,6 +10,7 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -76,8 +77,8 @@ public class ShellTest {
         for (Command command : commands) {
             prevResult = command.execute(prevResult);
         }
-        new File(file.toString()).deleteOnExit();
         assertEquals("2 6 31", prevResult);
+        new File(file.toString()).deleteOnExit();
     }
 
     @Test
@@ -95,13 +96,13 @@ public class ShellTest {
         for (Command command : commands) {
             prevResult = command.execute(prevResult);
         }
+        assertEquals("2 6 31", prevResult);
         new File(file.toString()).deleteOnExit();
-        assertEquals("2 6 30", prevResult);
     }
 
     @Test
     public void testEchoWc() throws IOException {
-        String content = "The first line\nThe second line";
+        String content = "The first line \"  \"";
         Environment environment = new Environment();
         Parser parser = new Parser();
         String line = "echo " + content + " | wc";
@@ -110,7 +111,37 @@ public class ShellTest {
         for (Command command : commands) {
             prevResult = command.execute(prevResult);
         }
-        assertEquals("2 6 30", prevResult);
+        assertEquals("1 3 18", prevResult);
+    }
+
+    @Test
+    public void testAssignEcho() throws IOException {
+        Environment environment = new Environment();
+        Parser parser = new Parser();
+        List<String> lines = Arrays.asList("x=echo", "$x  sg    sdf\"s    f\"sdf");
+        String prevResult = "";
+        for (String line : lines) {
+            List<Command> commands = parser.parse(line, environment);
+            for (Command command : commands) {
+                prevResult = command.execute(prevResult);
+            }
+        }
+        assertEquals("sg sdfs    fsdf", prevResult);
+    }
+
+    @Test
+    public void testAssignEchoWc() throws IOException {
+        Environment environment = new Environment();
+        Parser parser = new Parser();
+        List<String> lines = Arrays.asList("x=echo", "y=wc", "$x  sg    sdf\"s    f\"sdf |$y");
+        String prevResult = "";
+        for (String line : lines) {
+            List<Command> commands = parser.parse(line, environment);
+            for (Command command : commands) {
+                prevResult = command.execute(prevResult);
+            }
+        }
+        assertEquals("1 3 16", prevResult);
     }
 
     private String executeExternal(String command) throws IOException {

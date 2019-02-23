@@ -13,6 +13,8 @@ public class CommandFactory {
             return new WcCommand(tokens);
         } else if (firstToken.equals("cat")) {
             return new CatCommand(tokens);
+        } else if (firstToken.equals("exit")) {
+            return new ExitCommand(tokens);
         } else if (tokens.size() > 1 && tokens.get(1).equals("=")) {
             return new AssignCommand(tokens);
         } else {

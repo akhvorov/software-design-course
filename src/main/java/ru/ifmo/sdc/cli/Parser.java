@@ -99,10 +99,14 @@ class Parser {
         for (int i = 0; i < tokens.size(); i++) {
             String token = tokens.get(i);
             if (token.equals("|")) {
-                currentCommand.remove(currentCommand.size() - 1);
+                if (tokens.get(i - 1).equals(" ")) {
+                    currentCommand.remove(currentCommand.size() - 1);
+                }
                 commandGroups.add(currentCommand);
                 currentCommand = new ArrayList<>();
-                i++;
+                if (tokens.get(i + 1).equals(" ")) {
+                    i++;
+                }
                 continue;
             }
             currentCommand.add(token);
