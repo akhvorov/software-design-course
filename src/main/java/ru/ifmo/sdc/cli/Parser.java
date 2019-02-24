@@ -5,16 +5,31 @@ import ru.ifmo.sdc.cli.commands.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Parser from line to commands
+ */
 class Parser {
     private static final Set<Character> SPLITERS_SET = new HashSet<>(Arrays.asList('\'', '"', '|', '=', '$'));
-    private static final Set<String> KNOWN_COMMANDS_SET = new HashSet<>(Arrays.asList("echo", "cat", "wc", "pwd", "exit"));
     private static final CommandFactory commandFactory = new CommandFactory();
 
+    /**
+     * Make pipeline from command string
+     *
+     * @param line        string of commands
+     * @param environment global environment with variables
+     * @return list of commands in pipeline
+     */
     List<Command> parse(String line, Environment environment) {
         List<String> tokens = substitude(tokenize(line), environment);
         return groupByCommand(tokens).stream().map(commandFactory::getCommand).collect(Collectors.toList());
     }
 
+    /**
+     * Split line on tokens
+     *
+     * @param line line with commands
+     * @return list of tokens
+     */
     private List<String> tokenize(String line) {
         List<String> tokens = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
@@ -63,6 +78,13 @@ class Parser {
         return tokens;
     }
 
+    /**
+     * Make substitution of variables or make assigning
+     *
+     * @param tokens      list of tokens
+     * @param environment environment with variables
+     * @return list of tokens after substitution
+     */
     private List<String> substitude(List<String> tokens, Environment environment) {
         List<String> substTokens = new ArrayList<>();
         int weakBreakNum = 0;
@@ -80,7 +102,7 @@ class Parser {
                 i++;
                 continue;
             }
-            if (token.equals("=") && weakBreakNum != 1  && strongBreakNum != 1) {
+            if (token.equals("=") && weakBreakNum != 1 && strongBreakNum != 1) {
                 substTokens.remove(substTokens.size() - 1);
                 environment.put(tokens.get(i - 1), tokens.get(i + 1));
                 i++;
@@ -93,6 +115,12 @@ class Parser {
         return substTokens;
     }
 
+    /**
+     * Group tokens by command
+     *
+     * @param tokens list of tokens
+     * @return list of commands groups
+     */
     private List<List<String>> groupByCommand(List<String> tokens) {
         List<List<String>> commandGroups = new ArrayList<>();
         List<String> currentCommand = new ArrayList<>();

@@ -2,7 +2,16 @@ package ru.ifmo.sdc.cli.commands;
 
 import java.util.List;
 
+/**
+ * Create commands
+ */
 public class CommandFactory {
+    /**
+     * Create command by tokens
+     *
+     * @param tokens list of tokens
+     * @return command
+     */
     public Command getCommand(List<String> tokens) {
         String firstToken = tokens.get(0);
         if (firstToken.equals("pwd")) {

@@ -6,6 +6,9 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Wc command. Show lines, words and bytes in provided file or text
+ */
 public class WcCommand extends Command {
     public WcCommand(List<String> args) {
         super(args);
@@ -16,7 +19,12 @@ public class WcCommand extends Command {
         String text;
         int bytes = 0;
         if (args.size() > 2) {
-            text = new String(Files.readAllBytes(Paths.get(args.get(2))));
+            try {
+                text = new String(Files.readAllBytes(Paths.get(args.get(2))));
+            } catch (IOException e) {
+                System.err.println("Can't read file");
+                throw new IOException(e);
+            }
         } else {
             text = prevResult;
             bytes++;

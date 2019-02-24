@@ -2,6 +2,9 @@ package ru.ifmo.sdc.cli.commands;
 
 import java.util.List;
 
+/**
+ * Echo command. Print provided line
+ */
 public class EchoCommand extends Command {
     public EchoCommand(List<String> args) {
         super(args);
