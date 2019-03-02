@@ -19,8 +19,10 @@ class Parser {
      * @param environment global environment with variables
      * @return list of commands in pipeline
      */
-    List<Command> parse(String line, Environment environment) {
-        List<String> tokens = substitude(tokenize(line), environment);
+    public List<Command> parse(String line, Environment environment) {
+//        List<String> tokens = substitute(tokenize(line), environment);
+        String substitutedLine = environment.substitute(line);
+        List<String> tokens = substitute(tokenize(substitutedLine), environment);
         return groupByCommand(tokens).stream().map(commandFactory::getCommand).collect(Collectors.toList());
     }
 
@@ -85,7 +87,7 @@ class Parser {
      * @param environment environment with variables
      * @return list of tokens after substitution
      */
-    private List<String> substitude(List<String> tokens, Environment environment) {
+    private List<String> substitute(List<String> tokens, Environment environment) {
         List<String> substTokens = new ArrayList<>();
         int weakBreakNum = 0;
         int strongBreakNum = 0;

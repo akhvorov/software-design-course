@@ -19,28 +19,15 @@ import static org.junit.Assert.*;
 public class ShellTest {
     @Test
     public void testEcho() throws IOException {
-        Environment environment = new Environment();
-        Parser parser = new Parser();
-        String line = "echo abc\"def'gh\"ij'hk\"lm\"no'prstuv";
-        List<Command> commands = parser.parse(line, environment);
-        String prevResult = "";
-        for (Command command : commands) {
-            prevResult = command.execute(prevResult);
-        }
-        assertEquals("abcdef'ghijhk\"lm\"noprstuv", prevResult);
+        String result = executeCommands(Collections.singletonList("echo abc\"def'gh\"ij'hk\"lm\"no'prstuv"));
+        assertEquals("abcdef'ghijhk\"lm\"noprstuv", result);
     }
 
     @Test
     public void testPwd() throws IOException {
-        Environment environment = new Environment();
-        Parser parser = new Parser();
-        String line = "pwd";
-        List<Command> commands = parser.parse(line, environment);
-        String prevResult = "";
-        for (Command command : commands) {
-            prevResult = command.execute(prevResult);
-        }
-        assertEquals(executeExternal(line), prevResult);
+        String pwdCommand = "pwd";
+        String result = executeCommands(Collections.singletonList(pwdCommand));
+        assertEquals(executeExternal(pwdCommand), result);
     }
 
     @Test
@@ -50,16 +37,9 @@ public class ShellTest {
         Path file = Paths.get(tempFileName);
         Files.write(file, Collections.singleton(fileContent));
 
-        Environment environment = new Environment();
-        Parser parser = new Parser();
-        String line = "cat " + tempFileName;
-        List<Command> commands = parser.parse(line, environment);
-        String prevResult = "";
-        for (Command command : commands) {
-            prevResult = command.execute(prevResult);
-        }
         new File(file.toString()).deleteOnExit();
-        assertEquals(fileContent, prevResult);
+        String result = executeCommands(Collections.singletonList("cat " + tempFileName));
+        assertEquals(fileContent, result);
     }
 
     @Test
@@ -69,15 +49,8 @@ public class ShellTest {
         Path file = Paths.get(tempFileName);
         Files.write(file, Collections.singleton(fileContent));
 
-        Environment environment = new Environment();
-        Parser parser = new Parser();
-        String line = "wc " + tempFileName;
-        List<Command> commands = parser.parse(line, environment);
-        String prevResult = "";
-        for (Command command : commands) {
-            prevResult = command.execute(prevResult);
-        }
-        assertEquals("2 6 31", prevResult);
+        String result = executeCommands(Collections.singletonList("wc " + tempFileName));
+        assertEquals("2 6 31", result);
         new File(file.toString()).deleteOnExit();
     }
 
@@ -88,52 +61,56 @@ public class ShellTest {
         Path file = Paths.get(tempFileName);
         Files.write(file, Collections.singleton(fileContent));
 
-        Environment environment = new Environment();
-        Parser parser = new Parser();
-        String line = "cat " + tempFileName + " | wc";
-        List<Command> commands = parser.parse(line, environment);
-        String prevResult = "";
-        for (Command command : commands) {
-            prevResult = command.execute(prevResult);
-        }
-        assertEquals("2 6 31", prevResult);
+        String result = executeCommands(Collections.singletonList("cat " + tempFileName + " | wc"));
+        assertEquals("2 6 31", result);
         new File(file.toString()).deleteOnExit();
     }
 
     @Test
     public void testEchoWc() throws IOException {
-        String content = "The first line \"  \"";
-        Environment environment = new Environment();
-        Parser parser = new Parser();
-        String line = "echo " + content + " | wc";
-        List<Command> commands = parser.parse(line, environment);
-        String prevResult = "";
-        for (Command command : commands) {
-            prevResult = command.execute(prevResult);
-        }
-        assertEquals("1 3 18", prevResult);
+        String result = executeCommands(Collections.singletonList("echo The first line \"  \" | wc"));
+        assertEquals("1 3 18", result);
     }
 
     @Test
-    public void testAssignEcho() throws IOException {
-        Environment environment = new Environment();
-        Parser parser = new Parser();
-        List<String> lines = Arrays.asList("x=echo", "$x  sg    sdf\"s    f\"sdf");
-        String prevResult = "";
-        for (String line : lines) {
-            List<Command> commands = parser.parse(line, environment);
-            for (Command command : commands) {
-                prevResult = command.execute(prevResult);
-            }
-        }
-        assertEquals("sg sdfs    fsdf", prevResult);
+    public void testAssignedEcho() throws IOException {
+        String result = executeCommands(Arrays.asList("x=echo", "$x  sg    sdf\"s    f\"sdf"));
+        assertEquals("sg sdfs    fsdf", result);
+    }
+
+    @Test
+    public void testPartlyAssignedEcho() throws IOException {
+        String result = executeCommands(Arrays.asList("x=ho", "ec$x  sg    sdf\"s    f\"sdf"));
+        assertEquals("sg sdfs    fsdf", result);
+    }
+
+    @Test
+    public void testVarInStrongQuotes() throws IOException {
+        String result = executeCommands(Arrays.asList("x=ho", "echo sdf\"s$x   f\"sdf"));
+        assertEquals("sdfsho   fsdf", result);
+    }
+
+    @Test
+    public void testVarInWeakQuotes() throws IOException {
+        String result = executeCommands(Arrays.asList("x=ho", "echo sdf's$x   f'sdf"));
+        assertEquals("sdfs$x   fsdf", result);
+    }
+
+    @Test
+    public void testVarWithoutQuotes() throws IOException {
+        String result = executeCommands(Arrays.asList("x=ho", "echo sdfs$x   fsdf"));
+        assertEquals("sdfsho fsdf", result);
     }
 
     @Test
     public void testAssignEchoWc() throws IOException {
+        String result = executeCommands(Arrays.asList("x=echo", "y=wc", "$x  sg    sdf\"s    f\"sdf |$y"));
+        assertEquals("1 3 16", result);
+    }
+
+    private String executeCommands(List<String> lines) throws IOException {
         Environment environment = new Environment();
         Parser parser = new Parser();
-        List<String> lines = Arrays.asList("x=echo", "y=wc", "$x  sg    sdf\"s    f\"sdf |$y");
         String prevResult = "";
         for (String line : lines) {
             List<Command> commands = parser.parse(line, environment);
@@ -141,7 +118,7 @@ public class ShellTest {
                 prevResult = command.execute(prevResult);
             }
         }
-        assertEquals("1 3 16", prevResult);
+        return prevResult;
     }
 
     private String executeExternal(String command) throws IOException {
