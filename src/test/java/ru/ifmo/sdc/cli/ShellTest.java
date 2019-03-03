@@ -19,108 +19,108 @@ import static org.junit.Assert.*;
 public class ShellTest {
     @Test
     public void testEcho() throws IOException {
-        String result = executeCommands(Collections.singletonList("echo abc\"def'gh\"ij'hk\"lm\"no'prstuv"));
+        final String result = executeCommands(Collections.singletonList("echo abc\"def'gh\"ij'hk\"lm\"no'prstuv"));
         assertEquals("abcdef'ghijhk\"lm\"noprstuv", result);
     }
 
     @Test
     public void testEchoWithSpaces() throws IOException {
-        String result = executeCommands(Collections.singletonList("echo   abc  \"def'g  h\"i   j'hk\"lm\"no'prstuv  "));
+        final String result = executeCommands(Collections.singletonList("echo   abc  \"def'g  h\"i   j'hk\"lm\"no'prstuv  "));
         assertEquals("abc def'g  hi jhk\"lm\"noprstuv", result);
     }
 
     @Test
     public void testPwd() throws IOException {
-        String pwdCommand = "pwd";
-        String result = executeCommands(Collections.singletonList(pwdCommand));
+        final String pwdCommand = "pwd";
+        final String result = executeCommands(Collections.singletonList(pwdCommand));
         assertEquals(executeExternal(pwdCommand), result);
     }
 
     @Test
     public void testCat() throws IOException {
-        String tempFileName = "temp.file";
-        String fileContent = "The first line\nThe second line";
-        Path file = Paths.get(tempFileName);
+        final String tempFileName = "temp.file";
+        final String fileContent = "The first line\nThe second line";
+        final Path file = Paths.get(tempFileName);
         Files.write(file, Collections.singleton(fileContent));
 
         new File(file.toString()).deleteOnExit();
-        String result = executeCommands(Collections.singletonList("cat " + tempFileName));
-        String externalResult = executeExternal("cat " + tempFileName);
+        final String result = executeCommands(Collections.singletonList("cat " + tempFileName));
+        final String externalResult = executeExternal("cat " + tempFileName);
         assertEquals(externalResult, result);
         assertEquals(fileContent, result);
     }
 
     @Test
     public void testWc() throws IOException {
-        String tempFileName = "temp.file";
-        String fileContent = "The first line\nThe second line";
-        Path file = Paths.get(tempFileName);
+        final String tempFileName = "temp.file";
+        final String fileContent = "The first line\nThe second line";
+        final Path file = Paths.get(tempFileName);
         Files.write(file, Collections.singleton(fileContent));
 
-        String result = executeCommands(Collections.singletonList("wc " + tempFileName));
+        final String result = executeCommands(Collections.singletonList("wc " + tempFileName));
         assertEquals("2 6 31", result);
         new File(file.toString()).deleteOnExit();
     }
 
     @Test
     public void testCatWc() throws IOException {
-        String tempFileName = "temp.file";
-        String fileContent = "The first line\nThe second line";
-        Path file = Paths.get(tempFileName);
+        final String tempFileName = "temp.file";
+        final String fileContent = "The first line\nThe second line";
+        final Path file = Paths.get(tempFileName);
         Files.write(file, Collections.singleton(fileContent));
 
-        String result = executeCommands(Collections.singletonList("cat " + tempFileName + " | wc"));
+        final String result = executeCommands(Collections.singletonList("cat " + tempFileName + " | wc"));
         assertEquals("2 6 31", result);
         new File(file.toString()).deleteOnExit();
     }
 
     @Test
     public void testEchoWc() throws IOException {
-        String result = executeCommands(Collections.singletonList("echo The first line \"  \" | wc"));
+        final String result = executeCommands(Collections.singletonList("echo The first line \"  \" | wc"));
         assertEquals("1 3 18", result);
     }
 
     @Test
     public void testAssignedEcho() throws IOException {
-        String result = executeCommands(Arrays.asList("x=echo", "$x  sg    sdf\"s    f\"sdf"));
+        final String result = executeCommands(Arrays.asList("x=echo", "$x  sg    sdf\"s    f\"sdf"));
         assertEquals("sg sdfs    fsdf", result);
     }
 
     @Test
     public void testPartlyAssignedEcho() throws IOException {
-        String result = executeCommands(Arrays.asList("x=ho", "ec$x  sg    sdf\"s    f\"sdf"));
+        final String result = executeCommands(Arrays.asList("x=ho", "ec$x  sg    sdf\"s    f\"sdf"));
         assertEquals("sg sdfs    fsdf", result);
     }
 
     @Test
     public void testVarInStrongQuotes() throws IOException {
-        String result = executeCommands(Arrays.asList("x=ho", "echo sdf\"s$x   f\"sdf"));
+        final String result = executeCommands(Arrays.asList("x=ho", "echo sdf\"s$x   f\"sdf"));
         assertEquals("sdfsho   fsdf", result);
     }
 
     @Test
     public void testVarInWeakQuotes() throws IOException {
-        String result = executeCommands(Arrays.asList("x=ho", "echo sdf's$x   f'sdf"));
+        final String result = executeCommands(Arrays.asList("x=ho", "echo sdf's$x   f'sdf"));
         assertEquals("sdfs$x   fsdf", result);
     }
 
     @Test
     public void testVarWithoutQuotes() throws IOException {
-        String result = executeCommands(Arrays.asList("x=ho", "echo sdfs$x   fsdf"));
+        final String result = executeCommands(Arrays.asList("x=ho", "echo sdfs$x   fsdf"));
         assertEquals("sdfsho fsdf", result);
     }
 
     @Test
     public void testAssignEchoWc() throws IOException {
-        String result = executeCommands(Arrays.asList("x=echo", "y=wc", "$x  sg    sdf\"s    f\"sdf |$y"));
+        final String result = executeCommands(Arrays.asList("x=echo", "y=wc", "$x  sg    sdf\"s    f\"sdf |$y"));
         assertEquals("1 3 16", result);
     }
 
-    private String executeCommands(List<String> lines) throws IOException {
-        Environment environment = new Environment();
+    private String executeCommands(final List<String> lines) throws IOException {
+        final Environment environment = new Environment();
         String prevResult = "";
         for (String line : lines) {
-            List<Command> commands = Parser.parse(line, environment);
+            final List<Command> commands = Parser.parse(line, environment);
             for (Command command : commands) {
                 prevResult = command.execute(prevResult, environment);
             }
@@ -128,11 +128,11 @@ public class ShellTest {
         return prevResult;
     }
 
-    private String executeExternal(String command) throws IOException {
-        Process child = Runtime.getRuntime().exec(command);
-        BufferedReader stdInput = new BufferedReader(new
+    private String executeExternal(final String command) throws IOException {
+        final Process child = Runtime.getRuntime().exec(command);
+        final BufferedReader stdInput = new BufferedReader(new
                 InputStreamReader(child.getInputStream()));
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder();
         String s;
         boolean firstString = true;
         while ((s = stdInput.readLine()) != null) {

@@ -1,10 +1,6 @@
 package ru.ifmo.sdc.cli.commands;
 
-import picocli.CommandLine;
 import ru.ifmo.sdc.cli.Environment;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Assign command. Add variable to environment
@@ -12,12 +8,12 @@ import java.util.List;
 public class AssignCommand extends Command {
 
     @Override
-    public String execute(String prevResult, Environment environment) {
-        if (commandName.contains("=")) {
-            String assignation = commandName;
-            int equalsInd = assignation.indexOf('=');
-            String key = assignation.substring(0, equalsInd);
-            String value = assignation.substring(equalsInd + 1);
+    public String execute(final String prevResult, final Environment environment) {
+        final String assignation = commandName;
+        if (assignation != null && assignation.contains("=")) {
+            final int equalsInd = assignation.indexOf('=');
+            final String key = assignation.substring(0, equalsInd);
+            final String value = assignation.substring(equalsInd + 1);
             environment.put(key, value);
         }
         return "";

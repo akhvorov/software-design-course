@@ -7,7 +7,7 @@ import ru.ifmo.sdc.cli.Environment;
  */
 public class ExitCommand extends Command {
     @Override
-    public String execute(String prevResult, Environment environment) {
+    public String execute(final String prevResult, final Environment environment) {
         throw new UnsupportedOperationException();
     }
 

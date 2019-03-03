@@ -17,7 +17,7 @@ public class CatCommand extends Command {
     private List<String> params = new ArrayList<>();
 
     @Override
-    public String execute(String prevResult, Environment environment) throws IOException {
+    public String execute(final String prevResult, final Environment environment) throws IOException {
         String text;
         if (params.size() > 0) {
             try {

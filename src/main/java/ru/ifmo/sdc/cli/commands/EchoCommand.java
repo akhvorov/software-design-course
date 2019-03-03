@@ -14,7 +14,7 @@ public class EchoCommand extends Command {
     private List<String> words = new ArrayList<>();
 
     @Override
-    public String execute(String prevResult, Environment environment) {
+    public String execute(final String prevResult, final Environment environment) {
         return String.join(" ", words);
     }
 }

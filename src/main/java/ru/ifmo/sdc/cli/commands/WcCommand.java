@@ -18,8 +18,8 @@ public class WcCommand extends Command {
     private List<String> params = new ArrayList<>();
 
     @Override
-    public String execute(String prevResult, Environment environment) throws IOException {
-        String text;
+    public String execute(final String prevResult, final Environment environment) throws IOException {
+        final String text;
         int bytes = 0;
         if (params.size() > 0) {
             try {
@@ -32,8 +32,8 @@ public class WcCommand extends Command {
             text = prevResult;
             bytes++;
         }
-        int lines = text.split("\n").length;
-        int words = (int) Arrays.stream(text.split("[ \n\t\r]")).filter(x -> !x.isEmpty() && !x.equals(" ")).count();
+        final int lines = text.split("\n").length;
+        final int words = (int) Arrays.stream(text.split("[ \n\t\r]")).filter(x -> !x.isEmpty() && !x.equals(" ")).count();
         bytes += text.getBytes().length;
         return String.format("%d %d %d", lines, words, bytes);
     }

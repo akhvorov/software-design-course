@@ -15,17 +15,17 @@ public class ExternalCommand extends Command {
     private List<String> args = new ArrayList<>();
 
     @Override
-    public String execute(String prevResult, Environment environment) throws IOException {
-        Process child;
+    public String execute(final String prevResult, final Environment environment) throws IOException {
+        final Process child;
         try {
             child = Runtime.getRuntime().exec(commandName + String.join(" ", args));
         } catch (IOException e) {
             System.err.println("Can't execute external command");
             throw new IOException(e);
         }
-        BufferedReader stdInput = new BufferedReader(new
+        final BufferedReader stdInput = new BufferedReader(new
                 InputStreamReader(child.getInputStream()));
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder();
         String s;
         boolean firstString = true;
         while ((s = stdInput.readLine()) != null) {

@@ -14,10 +14,10 @@ public class CommandFactory {
      * @param tokens list of tokens
      * @return command
      */
-    public Command getCommand(List<String> tokens) {
-        String[] args = tokens.toArray(new String[0]);
-        String firstToken = tokens.get(0);
-        Command command;
+    public Command getCommand(final List<String> tokens) {
+        final String[] args = tokens.toArray(new String[0]);
+        final String firstToken = tokens.get(0);
+        final Command command;
         if (firstToken.equals("pwd")) {
             command = new PwdCommand();
         } else if (firstToken.equals("echo")) {

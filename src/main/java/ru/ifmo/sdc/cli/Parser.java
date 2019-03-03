@@ -18,10 +18,8 @@ class Parser {
      * @param environment global environment with variables
      * @return list of commands in pipeline
      */
-    public static List<Command> parse(String line, Environment environment) {
-        final String substitutedLine = environment.substitute(line);
-        List<String> tokens = tokenize(substitutedLine);
-//        tokens = substitute(tokens, environment);
+    public static List<Command> parse(final String line, final Environment environment) {
+        final List<String> tokens = tokenize(environment.substitute(line));
         return groupByCommand(tokens).stream().map(commandFactory::getCommand).collect(Collectors.toList());
     }
 
@@ -31,7 +29,7 @@ class Parser {
      * @param line the command line to process
      * @return list of tokens in line
      */
-    private static List<String> tokenize(String line) {
+    private static List<String> tokenize(final String line) {
         if (line == null || line.length() == 0) {
             return new ArrayList<>();
         }

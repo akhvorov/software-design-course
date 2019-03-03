@@ -8,7 +8,7 @@ import ru.ifmo.sdc.cli.Environment;
 public class PwdCommand extends Command {
 
     @Override
-    public String execute(String prevResult, Environment environment) {
+    public String execute(final String prevResult, final Environment environment) {
         return System.getProperty("user.dir");
     }
 }

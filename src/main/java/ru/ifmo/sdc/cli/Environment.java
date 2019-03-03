@@ -15,8 +15,8 @@ public class Environment {
      * @param line line with commands
      * @return same line with substituted variables
      */
-    public String substitute(String line) {
-        StringBuilder sb = new StringBuilder();
+    public String substitute(final String line) {
+        final StringBuilder sb = new StringBuilder();
         boolean inStrongQuotes = false;
         boolean inWeakQuotes = false;
         for (int i = 0; i < line.length(); i++) {
@@ -30,7 +30,7 @@ public class Environment {
             if (symbol == '$' && !inWeakQuotes) {
                 i++;
                 char tmpSymbol = line.charAt(i);
-                StringBuilder var = new StringBuilder();
+                final StringBuilder var = new StringBuilder();
                 while (Character.isAlphabetic(line.charAt(i)) || Character.isDigit(symbol)) {
                     var.append(tmpSymbol);
                     i++;

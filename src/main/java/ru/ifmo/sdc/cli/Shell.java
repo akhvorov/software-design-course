@@ -23,13 +23,13 @@ public class Shell {
      * Main loop of shell for read commands and write result
      */
     private void run() {
-        Scanner scanner = new Scanner(System.in);
-        Environment environment = new Environment();
+        final Scanner scanner = new Scanner(System.in);
+        final Environment environment = new Environment();
         boolean isAlive = true;
         while (isAlive) {
             System.out.print("$ ");
-            String line = scanner.nextLine();
-            List<Command> commands = Parser.parse(line, environment);
+            final String line = scanner.nextLine();
+            final List<Command> commands = Parser.parse(line, environment);
             String prevResult = "";
             for (Command command : commands) {
                 if (command.isTerminate()) {
