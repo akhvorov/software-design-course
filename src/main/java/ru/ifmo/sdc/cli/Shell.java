@@ -25,12 +25,11 @@ public class Shell {
     private void run() {
         Scanner scanner = new Scanner(System.in);
         Environment environment = new Environment();
-        Parser parser = new Parser();
         boolean isAlive = true;
         while (isAlive) {
             System.out.print("$ ");
             String line = scanner.nextLine();
-            List<Command> commands = parser.parse(line, environment);
+            List<Command> commands = Parser.parse(line, environment);
             String prevResult = "";
             for (Command command : commands) {
                 if (command.isTerminate()) {
@@ -38,7 +37,7 @@ public class Shell {
                     break;
                 }
                 try {
-                    prevResult = command.execute(prevResult);
+                    prevResult = command.execute(prevResult, environment);
                 } catch (IOException e) {
                     System.err.println("Execution interrupted");
                     break;

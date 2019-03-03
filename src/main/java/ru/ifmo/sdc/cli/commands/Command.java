@@ -1,31 +1,46 @@
 package ru.ifmo.sdc.cli.commands;
 
+import picocli.CommandLine.Parameters;
+import ru.ifmo.sdc.cli.Environment;
+
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Parent class for commands
  */
 public abstract class Command {
-    protected final List<String> args;
+    @Parameters(index = "0")
+    protected String commandName = null;
 
-    /**
-     * Constructor of command
-     *
-     * @param args list of tokens
-     */
-    public Command(List<String> args) {
-        this.args = args;
-    }
+//    protected final List<String> args;
+//
+//    /**
+//     * Constructor of command
+//     *
+//     * @param args list of tokens
+//     */
+//    public Command(List<String> args) {
+//        this.args = args;
+//    }
+//
+//    public Command() {
+//        args = new ArrayList<>();
+//    }
+//
+//    /**
+//     * Execute command
+//     *
+//     * @param prevResult input from pipe
+//     * @return result of execution
+//     * @throws IOException exception to read file or write result of external command execution
+//     */
+//    public String execute(String prevResult) throws IOException {
+//        return null;
+//    }
 
-    /**
-     * Execute command
-     *
-     * @param prevResult input from pipe
-     * @return result of execution
-     * @throws IOException exception to read file or write result of external command execution
-     */
-    public abstract String execute(String prevResult) throws IOException;
+    public abstract String execute(String prevResult, Environment environment) throws IOException;
 
     /**
      * Restore string from tokens

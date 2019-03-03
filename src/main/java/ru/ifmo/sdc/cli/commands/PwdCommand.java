@@ -1,17 +1,14 @@
 package ru.ifmo.sdc.cli.commands;
 
-import java.util.List;
+import ru.ifmo.sdc.cli.Environment;
 
 /**
  * Pwd command. Print current directory
  */
 public class PwdCommand extends Command {
-    public PwdCommand(List<String> args) {
-        super(args);
-    }
 
     @Override
-    public String execute(String prevResult) {
+    public String execute(String prevResult, Environment environment) {
         return System.getProperty("user.dir");
     }
 }

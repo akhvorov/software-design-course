@@ -24,6 +24,12 @@ public class ShellTest {
     }
 
     @Test
+    public void testEchoWithSpaces() throws IOException {
+        String result = executeCommands(Collections.singletonList("echo   abc  \"def'g  h\"i   j'hk\"lm\"no'prstuv  "));
+        assertEquals("abc def'g  hi jhk\"lm\"noprstuv", result);
+    }
+
+    @Test
     public void testPwd() throws IOException {
         String pwdCommand = "pwd";
         String result = executeCommands(Collections.singletonList(pwdCommand));
@@ -39,6 +45,8 @@ public class ShellTest {
 
         new File(file.toString()).deleteOnExit();
         String result = executeCommands(Collections.singletonList("cat " + tempFileName));
+        String externalResult = executeExternal("cat " + tempFileName);
+        assertEquals(externalResult, result);
         assertEquals(fileContent, result);
     }
 
@@ -110,12 +118,11 @@ public class ShellTest {
 
     private String executeCommands(List<String> lines) throws IOException {
         Environment environment = new Environment();
-        Parser parser = new Parser();
         String prevResult = "";
         for (String line : lines) {
-            List<Command> commands = parser.parse(line, environment);
+            List<Command> commands = Parser.parse(line, environment);
             for (Command command : commands) {
-                prevResult = command.execute(prevResult);
+                prevResult = command.execute(prevResult, environment);
             }
         }
         return prevResult;
