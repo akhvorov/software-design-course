@@ -99,11 +99,6 @@ class Parser {
             if (token.equals("'")) {
                 weakBreakNum ^= 1;
             }
-            if (token.equals("$") && weakBreakNum != 1) {
-                substTokens.add(environment.get(tokens.get(i + 1)));
-                i++;
-                continue;
-            }
             if (token.equals("=") && weakBreakNum != 1 && strongBreakNum != 1) {
                 substTokens.remove(substTokens.size() - 1);
                 environment.put(tokens.get(i - 1), tokens.get(i + 1));

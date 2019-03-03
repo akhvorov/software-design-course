@@ -49,16 +49,6 @@ public class Environment {
     }
 
     /**
-     * Get value of variable
-     *
-     * @param key variable name
-     * @return variable value
-     */
-    public String get(final String key) {
-        return variables.get(key);
-    }
-
-    /**
      * Save value of variable
      *
      * @param key   variable name
