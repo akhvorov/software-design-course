@@ -40,10 +40,7 @@ public class ShellTest {
     public void testCat() throws IOException {
         final String tempFileName = "temp.file";
         final String fileContent = "The first line\nThe second line";
-        final Path file = Paths.get(tempFileName);
-        Files.write(file, Collections.singleton(fileContent));
-
-        new File(file.toString()).deleteOnExit();
+        writeToTempFile(tempFileName, fileContent);
         final String result = executeCommands(Collections.singletonList("cat " + tempFileName));
         final String externalResult = executeExternal("cat " + tempFileName);
         assertEquals(externalResult, result);
@@ -54,24 +51,18 @@ public class ShellTest {
     public void testWc() throws IOException {
         final String tempFileName = "temp.file";
         final String fileContent = "The first line\nThe second line";
-        final Path file = Paths.get(tempFileName);
-        Files.write(file, Collections.singleton(fileContent));
-
+        writeToTempFile(tempFileName, fileContent);
         final String result = executeCommands(Collections.singletonList("wc " + tempFileName));
         assertEquals("2 6 31", result);
-        new File(file.toString()).deleteOnExit();
     }
 
     @Test
     public void testCatWc() throws IOException {
         final String tempFileName = "temp.file";
         final String fileContent = "The first line\nThe second line";
-        final Path file = Paths.get(tempFileName);
-        Files.write(file, Collections.singleton(fileContent));
-
+        writeToTempFile(tempFileName, fileContent);
         final String result = executeCommands(Collections.singletonList("cat " + tempFileName + " | wc"));
         assertEquals("2 6 31", result);
-        new File(file.toString()).deleteOnExit();
     }
 
     @Test
@@ -116,6 +107,48 @@ public class ShellTest {
         assertEquals("1 3 16", result);
     }
 
+    @Test
+    public void testGrepSingleLine() throws IOException {
+        testGrepFromFile("The first line", "lin", "");
+    }
+
+    @Test
+    public void testGrepMultipleLine() throws IOException {
+        testGrepFromFile("The first line\nThe Second Line", "lin", "");
+    }
+
+    @Test
+    public void testGrepCaseInsensitive() throws IOException {
+        testGrepFromFile("The first line\nThe Second Line", "lin", "-i");
+    }
+
+    @Test
+    public void testGrepWholeWord() throws IOException {
+        testGrepFromFile("The first line 1\nThe Second line2", "line", "-w");
+    }
+
+    @Test
+    public void testGrepWithNextStrings() throws IOException {
+        testGrepFromFile("The first line 1\nThe Second line2\nh\ne\nl\nl\no", "lin", "-A 2");
+    }
+
+    private void testGrepFromFile(final String content, final String pattern, final String options) throws IOException {
+        final String tempFileName = "temp.file";
+        writeToTempFile(tempFileName, content);
+        final String command = "grep " + options + " " + pattern + " " + tempFileName;
+        final String result = executeCommands(Collections.singletonList(command));
+        final String externalResult = executeExternal(command);
+        assertEquals(externalResult, result);
+    }
+
+    @Test
+    public void testGrepFromEcho() throws IOException {
+        final String text = "Zero Line 0\nFirst line 1\nsecond line2\nh\ne\nl\nl line \no\ny";
+        final String command = "echo \"" + text + "\" | grep " + " line -i -A 1 -w ";
+        final String result = executeCommands(Collections.singletonList(command));
+        assertEquals("Zero Line 0\nFirst line 1\nsecond line2\nl line \no", result);
+    }
+
     private String executeCommands(final List<String> lines) throws IOException {
         final Environment environment = new Environment();
         String prevResult = "";
@@ -143,5 +176,11 @@ public class ShellTest {
             firstString = false;
         }
         return sb.toString();
+    }
+
+    private void writeToTempFile(final String name, final String content) throws IOException {
+        final Path file = Paths.get(name);
+        Files.write(file, Collections.singleton(content));
+        new File(file.toString()).deleteOnExit();
     }
 }

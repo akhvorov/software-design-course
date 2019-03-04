@@ -29,7 +29,7 @@ public class CommandFactory {
         } else if (firstToken.equals("exit")) {
             command = new ExitCommand();
         } else if (firstToken.equals("grep")) {
-            command = new CatCommand();
+            command = new GrepCommand();
         } else if (tokens.size() == 1 && tokens.get(0).contains("=")) {
             command = new AssignCommand();
         } else {
