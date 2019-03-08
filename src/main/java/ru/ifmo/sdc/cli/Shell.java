@@ -24,7 +24,7 @@ public class Shell {
      */
     private void run() {
         final Scanner scanner = new Scanner(System.in);
-        final Environment environment = new Environment();
+        final Environment environment = new Environment(System.getenv());
         boolean isAlive = true;
         while (isAlive) {
             System.out.print("$ ");

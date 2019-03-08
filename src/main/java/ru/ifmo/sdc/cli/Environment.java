@@ -7,7 +7,11 @@ import java.util.Map;
  * Environment for save variables values
  */
 public class Environment {
-    private final Map<String, String> variables = new HashMap<>();
+    public Environment(Map<String, String> variables) {
+        this.variables = new HashMap<>(variables);
+    }
+
+    private final Map<String, String> variables;
 
     /**
      * Substitute variables values to string
@@ -46,6 +50,10 @@ public class Environment {
             sb.append(symbol);
         }
         return sb.toString();
+    }
+
+    public String get(final String key) {
+        return variables.getOrDefault(key, "");
     }
 
     /**
