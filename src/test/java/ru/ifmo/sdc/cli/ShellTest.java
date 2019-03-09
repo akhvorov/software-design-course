@@ -24,6 +24,31 @@ public class ShellTest {
     }
 
     @Test
+    public void testCdWithoutArgs() throws IOException {
+        final String result = executeCommands(Collections.singletonList("cd"), Collections.singletonList("pwd"));
+        assertEquals(System.getenv().get("HOME") + '\n', result);
+    }
+
+    @Test
+    public void testCdWithArgs() throws IOException {
+        final String result = executeCommands(Collections.singletonList("cd src"), Collections.singletonList("pwd"));
+        assertEquals(Paths.get(System.getProperty("user.dir"), "src").toString() + '\n', result);
+    }
+
+    @Test
+    public void testLsWithoutArgs() throws IOException {
+        final String result = executeCommands(Collections.singletonList("ls"));
+        assertTrue(result.contains("README.md\n"));
+    }
+
+    @Test
+    public void testLsWithArgs() throws IOException {
+        final String result = executeCommands(Collections.singletonList("ls src"));
+        assertTrue(result.contains("test\n"));
+        assertTrue(result.contains("main\n"));
+    }
+
+    @Test
     public void testEchoWithSpaces() throws IOException {
         final String result = executeCommands(Collections.singletonList("echo   abc  \"def'g  h\"i   j'hk\"lm\"no'prstuv  "));
         assertEquals("abc def'g  hi jhk\"lm\"noprstuv", result);
@@ -33,7 +58,7 @@ public class ShellTest {
     public void testPwd() throws IOException {
         final String pwdCommand = "pwd";
         final String result = executeCommands(Collections.singletonList(pwdCommand));
-        assertEquals(executeExternal(pwdCommand), result);
+        assertEquals(executeExternal(pwdCommand) + '\n', result);
     }
 
     @Test
@@ -149,13 +174,15 @@ public class ShellTest {
         assertEquals("Zero Line 0\nFirst line 1\nsecond line2\nl line \no", result);
     }
 
-    private String executeCommands(final List<String> lines) throws IOException {
-        final Environment environment = new Environment();
+    private String executeCommands(final List<String>... pipelinedLines) throws IOException {
+        final Environment environment = new Environment(System.getenv());
         String prevResult = "";
-        for (String line : lines) {
-            final List<Command> commands = Parser.parse(line, environment);
-            for (Command command : commands) {
-                prevResult = command.execute(prevResult, environment);
+        for (List<String> pipelinedLine : pipelinedLines) {
+            for (String pipelineCommand : pipelinedLine) {
+                final List<Command> commands = Parser.parse(pipelineCommand, environment);
+                for (Command command : commands) {
+                    prevResult = command.execute(prevResult, environment);
+                }
             }
         }
         return prevResult;

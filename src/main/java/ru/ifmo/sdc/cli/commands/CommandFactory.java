@@ -26,6 +26,10 @@ public class CommandFactory {
             command = new WcCommand();
         } else if (firstToken.equals("cat")) {
             command = new CatCommand();
+        } else if (firstToken.equals("ls")) {
+            command = new LsCommand();
+        } else if (firstToken.equals("cd")) {
+            command = new CdCommand();
         } else if (firstToken.equals("exit")) {
             command = new ExitCommand();
         } else if (firstToken.equals("grep")) {
