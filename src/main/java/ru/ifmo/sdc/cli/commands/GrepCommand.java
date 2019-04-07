@@ -33,11 +33,14 @@ public class GrepCommand extends Command {
 
     @Override
     public String execute(final String prevResult, final Environment environment) throws IOException {
+        if (linesAfter < 0) {
+            throw new IllegalArgumentException("Value of parameter A should be non negative");
+        }
         final String regex = makeRegex();
         final Pattern pattern = makePattern(regex);
         final List<String> lines = getLines(prevResult);
         final List<String> matched = new ArrayList<>(lines.size());
-        int printUntil = 0;
+        int printUntil = -1;
         for (int i = 0; i < lines.size(); i++) {
             String line = lines.get(i);
             if (pattern.matcher(line).matches()) {
@@ -80,6 +83,7 @@ public class GrepCommand extends Command {
 
     /**
      * Get list of lines for search
+     *
      * @param prevResult result of previous command
      * @return list of lines
      * @throws IOException can't read file

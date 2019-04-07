@@ -29,22 +29,26 @@ public class Shell {
         while (isAlive) {
             System.out.print("$ ");
             final String line = scanner.nextLine();
-            final List<Command> commands = Parser.parse(line, environment);
-            String prevResult = "";
-            for (Command command : commands) {
-                if (command.isTerminate()) {
-                    isAlive = false;
-                    break;
+            try {
+                final List<Command> commands = Parser.parse(line, environment);
+                String prevResult = "";
+                for (Command command : commands) {
+                    if (command.isTerminate()) {
+                        isAlive = false;
+                        break;
+                    }
+                    try {
+                        prevResult = command.execute(prevResult, environment);
+                    } catch (IOException e) {
+                        System.err.println("Execution interrupted");
+                        break;
+                    }
                 }
-                try {
-                    prevResult = command.execute(prevResult, environment);
-                } catch (IOException e) {
-                    System.err.println("Execution interrupted");
-                    break;
+                if (!prevResult.isEmpty()) {
+                    System.out.println(prevResult);
                 }
-            }
-            if (!prevResult.isEmpty()) {
-                System.out.println(prevResult);
+            } catch (RuntimeException e) {
+                System.out.println("Error: " + e.getMessage());
             }
         }
     }

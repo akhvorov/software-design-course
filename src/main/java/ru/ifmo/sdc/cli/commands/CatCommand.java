@@ -22,7 +22,7 @@ public class CatCommand extends Command {
         if (params.size() > 0) {
             try {
                 text = new String(Files.readAllBytes(Paths.get(params.get(0))));
-                text = text.substring(0, text.length() - 1);
+                text = text.trim(); //.substring(0, text.length() - 1);
             } catch (IOException e) {
                 System.err.println("Can't read file");
                 throw new IOException(e);

@@ -35,6 +35,10 @@ public class CommandFactory {
         } else {
             return CommandLine.populateCommand(new ExternalCommand(args), args[0]);
         }
-        return CommandLine.populateCommand(command, args);
+        try {
+            return CommandLine.populateCommand(command, args);
+        } catch (RuntimeException e) {
+            throw new RuntimeException("Can't parse arguments");
+        }
     }
 }

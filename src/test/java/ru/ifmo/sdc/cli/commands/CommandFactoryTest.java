@@ -20,4 +20,9 @@ public class CommandFactoryTest {
         assertTrue(CommandFactory.getCommand(Collections.singletonList("pwd")) instanceof PwdCommand);
         assertTrue(CommandFactory.getCommand(Arrays.asList("wc", "temp.file")) instanceof WcCommand);
     }
+
+    @Test(expected = RuntimeException.class)
+    public void testWrongArguments() {
+        CommandFactory.getCommand(Arrays.asList("grep", "hello", "temp.file", "-A", "text"));
+    }
 }
