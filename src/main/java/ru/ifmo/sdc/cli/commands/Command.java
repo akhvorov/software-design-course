@@ -25,7 +25,7 @@ public abstract class Command {
     /**
      * Flag for exit command
      *
-     * @return is this command is exit
+     * @return is this command is exited
      */
     public boolean isTerminate() {
         return false;

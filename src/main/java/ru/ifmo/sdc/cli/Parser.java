@@ -9,100 +9,67 @@ import java.util.stream.Collectors;
  * Parser from line to commands
  */
 class Parser {
-    private static final CommandFactory commandFactory = new CommandFactory();
-
     /**
      * Make pipeline from command string
      *
      * @param line        string of commands
      * @param environment global environment with variables
-     * @return list of commands in pipeline
+     * @return list of commands in the pipeline
      */
     public static List<Command> parse(final String line, final Environment environment) {
-        final List<String> tokens = tokenize(environment.substitute(line));
-        return groupByCommand(tokens).stream().map(commandFactory::getCommand).collect(Collectors.toList());
+        final List<String> tokens = new Tokenizer(substitute(environment, line)).tokens();
+        return splitByPipe(tokens).stream().map(CommandFactory::getCommand).collect(Collectors.toList());
     }
 
     /**
-     * Split string on tokens
+     * Substitute variables values to string
      *
-     * @param line the command line to process
-     * @return list of tokens in line
+     * @param environment current environment
+     * @param line line with commands
+     * @return same line with substituted variables
      */
-    private static List<String> tokenize(final String line) {
-        if (line == null || line.length() == 0) {
-            return new ArrayList<>();
-        }
-        final int ordinary = 0;
-        final int inWeakQuote = 1;
-        final int inStrongQuote = 2;
-        int state = ordinary;
-        final StringTokenizer tok = new StringTokenizer(line, "\"\' |", true);
-        final List<String> result = new ArrayList<>();
-        final StringBuilder current = new StringBuilder();
-        boolean lastTokenIsQuoted = false;
-
-        while (tok.hasMoreTokens()) {
-            String token = tok.nextToken();
-            switch (state) {
-                case inWeakQuote:
-                    if (token.equals("\'")) {
-                        lastTokenIsQuoted = true;
-                        state = ordinary;
-                    } else {
-                        current.append(token);
-                    }
-                    break;
-                case inStrongQuote:
-                    if (token.equals("\"")) {
-                        lastTokenIsQuoted = true;
-                        state = ordinary;
-                    } else {
-                        current.append(token);
-                    }
-                    break;
-                default:
-                    switch (token) {
-                        case "\'":
-                            state = inWeakQuote;
-                            break;
-                        case "\"":
-                            state = inStrongQuote;
-                            break;
-                        case " ":
-                            if (lastTokenIsQuoted || current.length() != 0) {
-                                result.add(current.toString());
-                                current.setLength(0);
-                            }
-                            break;
-                        case "|":
-                            if (current.length() != 0) {
-                                result.add(current.toString());
-                                current.setLength(0);
-                            }
-                            result.add("|");
-                            break;
-                        default:
-                            current.append(token);
-                            break;
-                    }
-                    lastTokenIsQuoted = false;
-                    break;
+    public static String substitute(final Environment environment, final String line) {
+        final StringBuilder sb = new StringBuilder();
+        boolean inStrongQuotes = false;
+        boolean inWeakQuotes = false;
+        for (int i = 0; i < line.length(); i++) {
+            final char symbol = line.charAt(i);
+            if (symbol == '\'' && !inStrongQuotes) {
+                inWeakQuotes ^= true;
             }
+            if (symbol == '"' && !inWeakQuotes) {
+                inStrongQuotes ^= true;
+            }
+            if (symbol == '$' && !inWeakQuotes) {
+                i++;
+                char tmpSymbol = line.charAt(i);
+                final StringBuilder var = new StringBuilder();
+                while (Character.isAlphabetic(line.charAt(i)) || Character.isDigit(symbol)) {
+                    var.append(tmpSymbol);
+                    i++;
+                    if (i == line.length()) {
+                        break;
+                    }
+                    tmpSymbol = line.charAt(i);
+                }
+                i--;
+                if (environment.contains(var.toString())) {
+                    sb.append(environment.get(var.toString()));
+                }
+                continue;
+            }
+            sb.append(symbol);
         }
-        if (lastTokenIsQuoted || current.length() != 0) {
-            result.add(current.toString());
-        }
-        return result;
+        return sb.toString();
     }
 
     /**
-     * Group tokens by command
+     * Split tokens by the pipe
      *
      * @param tokens list of tokens
-     * @return list of commands groups
+     * @return list of pipe-split tokens
      */
-    private static List<List<String>> groupByCommand(final List<String> tokens) {
+    private static List<List<String>> splitByPipe(final List<String> tokens) {
         final List<List<String>> commandGroups = new ArrayList<>();
         List<String> currentCommand = new ArrayList<>();
         for (final String token : tokens) {

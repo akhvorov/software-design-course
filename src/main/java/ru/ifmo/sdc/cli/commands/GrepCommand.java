@@ -66,7 +66,7 @@ public class GrepCommand extends Command {
     }
 
     /**
-     * Compile pattern with respect to options
+     * Compile the pattern with respect to options
      *
      * @param regex regex
      * @return compiled pattern
