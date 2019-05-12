@@ -7,11 +7,13 @@ import java.util.Map;
  * Environment for save variables values
  */
 public class Environment {
-    public Environment(Map<String, String> variables) {
+    public Environment(Map<String, String> variables, String userDir) {
         this.variables = new HashMap<>(variables);
+        this.userDir = userDir;
     }
 
     private final Map<String, String> variables;
+    public String userDir;
 
     /**
      * Substitute variables values to string

@@ -13,7 +13,7 @@ import java.util.List;
  * Change working directory to first argument or home.
  */
 public class CdCommand extends Command {
-    @CommandLine.Parameters(index = "1..*")
+    @CommandLine.Parameters(index = "1..1")
     private List<String> params = new ArrayList<>();
 
     @Override
@@ -21,15 +21,12 @@ public class CdCommand extends Command {
         final Path relativePath = Paths.get(params.isEmpty() ? environment.get("HOME") : params.get(0));
         final Path path = relativePath.isAbsolute() ?
                 relativePath :
-                Paths.get(environment.get("PWD"), relativePath.toString()).toAbsolutePath();
+                Paths.get(environment.userDir, relativePath.toString()).toAbsolutePath();
         if (!path.toFile().isDirectory()) {
             System.err.println("cd: " + path + ": No such file or directory");
             throw new IOException();
         }
-        environment.put(
-                "PWD",
-                path.toString()
-        );
+        environment.userDir = path.normalize().toString();
         return "";
     }
 }

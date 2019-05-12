@@ -1,6 +1,7 @@
 package ru.ifmo.sdc.cli;
 
 import org.junit.Test;
+import picocli.CommandLine;
 import ru.ifmo.sdc.cli.commands.Command;
 
 import java.io.BufferedReader;
@@ -35,6 +36,12 @@ public class ShellTest {
         assertEquals(Paths.get(System.getProperty("user.dir"), "src").toString() + '\n', result);
     }
 
+    @Test(expected = CommandLine.UnmatchedArgumentException.class)
+    public void testCdWithTooManyArgs() throws IOException {
+        final String result = executeCommands(Collections.singletonList("cd a b"), Collections.singletonList("pwd"));
+        assertEquals(Paths.get(System.getProperty("user.dir"), "src").toString() + '\n', result);
+    }
+
     @Test
     public void testLsWithoutArgs() throws IOException {
         final String result = executeCommands(Collections.singletonList("ls"));
@@ -44,8 +51,8 @@ public class ShellTest {
     @Test
     public void testLsWithArgs() throws IOException {
         final String result = executeCommands(Collections.singletonList("ls src"));
-        assertTrue(result.contains("test\n"));
-        assertTrue(result.contains("main\n"));
+        assertTrue(result.contains("test"));
+        assertTrue(result.contains("main"));
     }
 
     @Test
@@ -175,7 +182,7 @@ public class ShellTest {
     }
 
     private String executeCommands(final List<String>... pipelinedLines) throws IOException {
-        final Environment environment = new Environment(System.getenv());
+        final Environment environment = new Environment(System.getenv(), System.getProperty("user.dir"));
         String prevResult = "";
         for (List<String> pipelinedLine : pipelinedLines) {
             for (String pipelineCommand : pipelinedLine) {

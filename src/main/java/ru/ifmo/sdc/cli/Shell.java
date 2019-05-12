@@ -1,5 +1,6 @@
 package ru.ifmo.sdc.cli;
 
+import picocli.CommandLine;
 import ru.ifmo.sdc.cli.commands.Command;
 
 import java.io.IOException;
@@ -24,27 +25,31 @@ public class Shell {
      */
     private void run() {
         final Scanner scanner = new Scanner(System.in);
-        final Environment environment = new Environment(System.getenv());
+        final Environment environment = new Environment(System.getenv(), System.getProperty("user.dir"));
         boolean isAlive = true;
         while (isAlive) {
             System.out.print("$ ");
             final String line = scanner.nextLine();
-            final List<Command> commands = Parser.parse(line, environment);
-            String prevResult = "";
-            for (Command command : commands) {
-                if (command.isTerminate()) {
-                    isAlive = false;
-                    break;
+            try {
+                final List<Command> commands = Parser.parse(line, environment);
+                String prevResult = "";
+                for (Command command : commands) {
+                    if (command.isTerminate()) {
+                        isAlive = false;
+                        break;
+                    }
+                    try {
+                        prevResult = command.execute(prevResult, environment);
+                    } catch (IOException e) {
+                        System.err.println("Execution interrupted");
+                        break;
+                    }
                 }
-                try {
-                    prevResult = command.execute(prevResult, environment);
-                } catch (IOException e) {
-                    System.err.println("Execution interrupted");
-                    break;
+                if (!prevResult.isEmpty()) {
+                    System.out.println(prevResult);
                 }
-            }
-            if (!prevResult.isEmpty()) {
-                System.out.println(prevResult);
+            } catch (CommandLine.ParameterException e) {
+                System.err.println(e.getValue());
             }
         }
     }

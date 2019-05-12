@@ -9,6 +9,6 @@ public class PwdCommand extends Command {
 
     @Override
     public String execute(final String prevResult, final Environment environment) {
-        return environment.get("PWD") + '\n';
+        return environment.userDir + '\n';
     }
 }
