@@ -49,7 +49,7 @@ public class Shell {
                     System.out.println(prevResult);
                 }
             } catch (CommandLine.ParameterException e) {
-                System.err.println(e.getValue());
+                System.err.println(e.getMessage());
             }
         }
     }
