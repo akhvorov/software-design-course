@@ -25,9 +25,14 @@ public class ExternalCommand extends Command {
             System.err.println("Can't execute external command");
             throw new IOException(e);
         }
-        final BufferedReader stdInput = new BufferedReader(new
-                InputStreamReader(child.getInputStream()));
         final StringBuilder sb = new StringBuilder();
+        readStream(child.getInputStream(), sb);
+        readStream(child.getErrorStream(), sb);
+        return sb.toString();
+    }
+
+    private void readStream(final InputStream stream, final StringBuilder sb) throws IOException {
+        final BufferedReader stdInput = new BufferedReader(new InputStreamReader(stream));
         String s;
         boolean firstString = true;
         while ((s = stdInput.readLine()) != null) {
@@ -37,6 +42,5 @@ public class ExternalCommand extends Command {
             sb.append(s);
             firstString = false;
         }
-        return sb.toString();
     }
 }
